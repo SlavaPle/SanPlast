@@ -38,8 +38,16 @@ namespace SanPlast.Model
             WrightText(i, 0, LS[0].OdSz.ToString(), new Point(i.Width / 5, i.Height / 5 - 20));
             WrightText(i, 0, LS[1].OdSz.ToString(), new Point(i.Width - i.Width / 5, i.Height / 5 - 20));
             WrightText(i, -90, Wys.ToString(), new Point(i.Width - i.Width / 6, i.Height / 2 + 50));
-            if (LS[0].OdSz != 0) NewLine(i, LS[0].OdSz > 0 ? 120 : -60, new Point(i.Width / 10, i.Height / 5 - 5));
-            if (LS[1].OdSz != 0) NewLine(i, LS[1].OdSz < 0 ? 60 : -120, new Point(i.Width - i.Width / 10, i.Height / 5 - 5));
+            if (LS[0].OdSz != 0) DrawArrow(i, LS[0].OdSz > 0 ? 120 : -60, new Point(i.Width / 10, i.Height / 5 - 5));
+            if (LS[1].OdSz != 0) DrawArrow(i, LS[1].OdSz < 0 ? 60 : -120, new Point(i.Width - i.Width / 10, i.Height / 5 - 5));
+
+            if (Slant)
+                DrawLine(i, SlantDim[1], SlantDim[0], 300);
+            if (Cutout)
+            {
+                DrawLine(i, 90, CutoutDim[0], CutoutDim[2], true);
+                //DrawLine(i, 180, new Point(CutoutDim[0], CutoutDim[2]), CutoutDim[0]);
+            }
 
             if (!Strona) i.RotateFlip(RotateFlipType.RotateNoneFlipX);
 
@@ -54,18 +62,47 @@ namespace SanPlast.Model
             //pictureBox2.Image = bitmap;
             //Graphics G = i.to;
             return i;
+
+
         }
 
-        private void NewLine(Bitmap i, int angle, Point P)
+        private void DrawArrow(Bitmap i, int angle, Point P)
         {
             using (Graphics g = Graphics.FromImage(i))
             {
                 g.TranslateTransform(P.X, P.Y);
                 g.RotateTransform(angle);
-                Pen blackPen = new Pen(Color.Black, 5);
+                Pen blackPen = new Pen(Color.Blue, 5);
                 g.DrawLine(blackPen, 0, 0, 0, 50);
                 g.DrawLine(blackPen, 0, 50, 10, 30);
                 g.DrawLine(blackPen, 0, 50, -10, 30);
+            }
+        }
+
+        private void DrawLine(Bitmap i, int angle, int H, int W, bool cut = false)
+        {
+            using (Graphics g = Graphics.FromImage(i))
+            {
+                Pen pen = new Pen(Color.Red, 5);
+                int hh = Map(H, 0, Wys, 0, 455); ;
+                //L = h ?  : Map(L, 0, Convert.ToInt32(Szer[1] * .866), 0, 174);
+                H = Map(H, 0, Wys, 615, 160);
+                W = Map(W, 0,  Convert.ToInt32(Szer[1] * .866),0, 174);
+                g.TranslateTransform(392, H);
+                g.RotateTransform(Map(angle, 90, 180, 60, 180));
+
+                if (cut)
+                {
+                    g.DrawLine(pen, 0, 0, 0, W);
+                    g.TranslateTransform(0, W);
+                    g.DrawLine(pen, 0, 0, Convert.ToInt32(hh * .866), Convert.ToInt32(hh * .5));
+                }
+                else g.DrawLine(pen, 0, 0, 0, H);
+            }
+
+            int Map(int input, int inputMin, int inputMax, int min, int max)
+            {
+                return min + (input - inputMin) * (max - min) / (inputMax - inputMin);
             }
         }
         private void pictureBox1_MouseWheel(object sender, MouseEventArgs e)
@@ -235,9 +272,9 @@ namespace SanPlast.Model
                     swApp.CloseDoc(newDrawingFilePath);
                 }
 
-               DataRow R = Cabin.Zestawienie.NewRow();
+                DataRow R = Cabin.Zestawienie.NewRow();
                 R[0] = "Szyba";
-                R[1] = (Szyba.Wys + "x"+Math.Max(Szyba.Sz,Szyba.SzG)+"x6");
+                R[1] = (Szyba.Wys + "x" + Math.Max(Szyba.Sz, Szyba.SzG) + "x6");
                 R[2] = "szt.";
                 R[3] = "1";
                 R[4] = Typ;
@@ -246,7 +283,7 @@ namespace SanPlast.Model
 
             void ToCSV(DataTable dtDataTable, string strFilePath)
             {
-                StreamWriter sw = new StreamWriter(strFilePath, false,Encoding.UTF8);
+                StreamWriter sw = new StreamWriter(strFilePath, false, Encoding.UTF8);
                 //headers    
                 for (int i = 0; i < dtDataTable.Columns.Count; i++)
                 {

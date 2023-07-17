@@ -360,7 +360,7 @@ namespace SanPlast
             this.PCutout.MaximumSize = new System.Drawing.Size(244, 80);
             this.PCutout.MinimumSize = new System.Drawing.Size(244, 20);
             this.PCutout.Name = "PCutout";
-            this.PCutout.Size = new System.Drawing.Size(244, 20);
+            this.PCutout.Size = new System.Drawing.Size(244, 80);
             this.PCutout.TabIndex = 1;
             // 
             // NudCutHeightOdch
@@ -503,12 +503,7 @@ namespace SanPlast
             // 
             this.NudSlantAngle.Location = new System.Drawing.Point(47, 47);
             this.NudSlantAngle.Maximum = new decimal(new int[] {
-            179,
-            0,
-            0,
-            0});
-            this.NudSlantAngle.Minimum = new decimal(new int[] {
-            91,
+            360,
             0,
             0,
             0});
