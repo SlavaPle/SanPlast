@@ -360,11 +360,12 @@ namespace SanPlast
             this.PCutout.MaximumSize = new System.Drawing.Size(244, 80);
             this.PCutout.MinimumSize = new System.Drawing.Size(244, 20);
             this.PCutout.Name = "PCutout";
-            this.PCutout.Size = new System.Drawing.Size(244, 80);
+            this.PCutout.Size = new System.Drawing.Size(244, 20);
             this.PCutout.TabIndex = 1;
             // 
             // NudCutHeightOdch
             // 
+            this.NudCutHeightOdch.Enabled = false;
             this.NudCutHeightOdch.Location = new System.Drawing.Point(156, 21);
             this.NudCutHeightOdch.Minimum = new decimal(new int[] {
             100,
@@ -374,6 +375,7 @@ namespace SanPlast
             this.NudCutHeightOdch.Name = "NudCutHeightOdch";
             this.NudCutHeightOdch.Size = new System.Drawing.Size(76, 20);
             this.NudCutHeightOdch.TabIndex = 4;
+            this.NudCutHeightOdch.Visible = false;
             this.NudCutHeightOdch.ValueChanged += new System.EventHandler(this.NUDWys_ValueChanged);
             // 
             // NudCutHeight
@@ -388,7 +390,7 @@ namespace SanPlast
             this.NudCutHeight.Size = new System.Drawing.Size(76, 20);
             this.NudCutHeight.TabIndex = 3;
             this.NudCutHeight.Value = new decimal(new int[] {
-            900,
+            500,
             0,
             0,
             0});
@@ -406,7 +408,7 @@ namespace SanPlast
             this.NudCutWidth.Size = new System.Drawing.Size(76, 20);
             this.NudCutWidth.TabIndex = 5;
             this.NudCutWidth.Value = new decimal(new int[] {
-            900,
+            100,
             0,
             0,
             0});
@@ -414,6 +416,7 @@ namespace SanPlast
             // 
             // NudCutWidthOdch
             // 
+            this.NudCutWidthOdch.Enabled = false;
             this.NudCutWidthOdch.Location = new System.Drawing.Point(156, 47);
             this.NudCutWidthOdch.Minimum = new decimal(new int[] {
             100,
@@ -423,6 +426,7 @@ namespace SanPlast
             this.NudCutWidthOdch.Name = "NudCutWidthOdch";
             this.NudCutWidthOdch.Size = new System.Drawing.Size(76, 20);
             this.NudCutWidthOdch.TabIndex = 6;
+            this.NudCutWidthOdch.Visible = false;
             this.NudCutWidthOdch.ValueChanged += new System.EventHandler(this.NUDWys_ValueChanged);
             // 
             // label14
@@ -433,6 +437,7 @@ namespace SanPlast
             this.label14.Size = new System.Drawing.Size(26, 13);
             this.label14.TabIndex = 14;
             this.label14.Text = "Cc±";
+            this.label14.Visible = false;
             // 
             // label11
             // 
@@ -451,6 +456,7 @@ namespace SanPlast
             this.label13.Size = new System.Drawing.Size(26, 13);
             this.label13.TabIndex = 13;
             this.label13.Text = "Ac±";
+            this.label13.Visible = false;
             // 
             // label12
             // 
@@ -503,7 +509,12 @@ namespace SanPlast
             // 
             this.NudSlantAngle.Location = new System.Drawing.Point(47, 47);
             this.NudSlantAngle.Maximum = new decimal(new int[] {
-            360,
+            179,
+            0,
+            0,
+            0});
+            this.NudSlantAngle.Minimum = new decimal(new int[] {
+            91,
             0,
             0,
             0});

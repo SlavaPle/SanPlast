@@ -22,6 +22,7 @@ namespace SanPlast
         {
             InitializeComponent();
 
+            //Dane.Dane.SaveDS();
             Dane.Dane.ReadDS();
         }
 
@@ -58,6 +59,9 @@ namespace SanPlast
             C.LS[1].OdSz = Convert.ToInt32(NUDOdchC.Value);
             C.SlantDim = new int[] { Convert.ToInt32(NudSlantHeight.Value), Convert.ToInt32(NudSlantAngle.Value) };
             C.CutoutDim = new int[] { Convert.ToInt32(NudCutHeight.Value), Convert.ToInt32(NudCutHeightOdch.Value), Convert.ToInt32(NudCutWidth.Value), Convert.ToInt32(NudCutWidthOdch.Value) };
+            NudSlantHeight.Maximum = NUDWys.Value;
+            NudCutHeight.Maximum = NUDWys.Value;
+            NudCutWidth.Maximum = NUDSzC.Value;
             ReturnPicture();
         }
 
@@ -109,6 +113,7 @@ namespace SanPlast
                 PSlant.Height = PSlant.MinimumSize.Height;
                 C.Slant = false;
             }
+            ReturnPicture();
         }
 
         private void CbCutout_CheckedChanged(object sender, EventArgs e)
@@ -123,6 +128,7 @@ namespace SanPlast
                 PCutout.Size = PCutout.MinimumSize;
                 C.Cutout = false;
             }
+            ReturnPicture();
         }
     }
 }

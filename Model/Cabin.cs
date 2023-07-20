@@ -19,6 +19,13 @@ namespace SanPlast.Model
 {
     class Cabin
     {
+        //        public Dictionary<string, string> D = new Dictionary<string, string>()
+        //    {{"H", Wys.ToString() },
+        //        { "B", Szer[0].ToString() },
+        //        { "C", Szer[1].ToString() },
+        //        {"ob", LS[0].OdSz.ToString() },
+        //        {"oc", LS[1].OdSz.ToString() },
+        //};
         public int Wys { get; set; }
         public int[] Szer { get; set; }
         public List<Szyba> LS { get; set; }
@@ -42,11 +49,16 @@ namespace SanPlast.Model
             if (LS[1].OdSz != 0) DrawArrow(i, LS[1].OdSz < 0 ? 60 : -120, new Point(i.Width - i.Width / 10, i.Height / 5 - 5));
 
             if (Slant)
+            {
                 DrawLine(i, SlantDim[1], SlantDim[0], 300);
+                WrightText(i, -90, SlantDim[0].ToString(), new Point(i.Width - i.Width / 10 + 24, Wys / 5 - SlantDim[0] / 5 + 200), true);
+                WrightText(i, 0, SlantDim[1].ToString(), new Point(i.Width - i.Width / 10 - 33, Wys / 5 - SlantDim[0] / 5 + 200), true);
+            }
             if (Cutout)
             {
                 DrawLine(i, 90, CutoutDim[0], CutoutDim[2], true);
-                //DrawLine(i, 180, new Point(CutoutDim[0], CutoutDim[2]), CutoutDim[0]);
+                WrightText(i, -90, CutoutDim[0].ToString(), new Point(i.Width - i.Width / 10 + 24, Wys / 5 - CutoutDim[0] / 5 + 220), true);
+                WrightText(i, -25, CutoutDim[2].ToString(), new Point(i.Width - i.Width / 5 + 25, i.Height - 100), true);
             }
 
             if (!Strona) i.RotateFlip(RotateFlipType.RotateNoneFlipX);
@@ -62,8 +74,6 @@ namespace SanPlast.Model
             //pictureBox2.Image = bitmap;
             //Graphics G = i.to;
             return i;
-
-
         }
 
         private void DrawArrow(Bitmap i, int angle, Point P)
@@ -87,7 +97,7 @@ namespace SanPlast.Model
                 int hh = Map(H, 0, Wys, 0, 455); ;
                 //L = h ?  : Map(L, 0, Convert.ToInt32(Szer[1] * .866), 0, 174);
                 H = Map(H, 0, Wys, 615, 160);
-                W = Map(W, 0,  Convert.ToInt32(Szer[1] * .866),0, 174);
+                W = Map(W, 0, Convert.ToInt32(Szer[1] * .866), 0, 174);
                 g.TranslateTransform(392, H);
                 g.RotateTransform(Map(angle, 90, 180, 60, 180));
 
@@ -110,16 +120,29 @@ namespace SanPlast.Model
             //you can do anything here
         }
 
-        private void WrightText(Bitmap i, int angle, string text, Point P)
+        private void WrightText(Bitmap i, int angle, string text, Point P, bool d = false)
         {
             using (Graphics g = Graphics.FromImage(i))
             {
                 g.TranslateTransform(P.X, P.Y);
                 g.RotateTransform(angle);
                 if (!Strona) g.MultiplyTransform(new Matrix(-1, 0, 0, 1, 0, 0));
-                Font font = new Font("Arial", 40);
-                SizeF textSize = g.MeasureString(text, font);
-                g.DrawString(text, font, Brushes.Black, -(textSize.Width / 2), -(textSize.Height / 2));
+                Font font;
+                SizeF textSize;
+                Brush brush;
+                if (d)
+                {
+                    font = new Font("Arial", 30);
+                    textSize = g.MeasureString(text, font);
+                    brush = Brushes.Red;
+                }
+                else
+                {
+                    font = new Font("Arial", 40);
+                    textSize = g.MeasureString(text, font);
+                    brush = Brushes.Black;
+                }
+                g.DrawString(text, font, brush, -(textSize.Width / 2), -(textSize.Height / 2));
             }
         }
 
@@ -140,7 +163,6 @@ namespace SanPlast.Model
             Zestawienie.Columns.Add(new DataColumn("Uwaga", typeof(string)));
             foreach (DataRow r in Dane.Dane.DS.Tables["Kabina"].Rows)
             {
-
                 if (r["Element"].ToString().Contains("Szyba"))
                 { GetSzyba(r); }
                 else
@@ -155,6 +177,12 @@ namespace SanPlast.Model
             void GetKomponent(DataRow r)
             {
                 int val = GetFromString(ChangeLetterToNumber(r["L"]));
+                int val1 = GetFromString(r["L"]);
+                if (r["S"].ToString() == "+")
+                {
+                    if (Slant) val = SlantDim[0] + 20;
+                    if (Cutout) val -= CutoutDim[0];
+                }
                 Dane.Dane.DS.Tables["Set"].AsEnumerable()
                .Where(x => x["Element"].ToString() == r["Element"].ToString() && Convert.ToInt32(x["Min"]) <= val && Convert.ToInt32(x["Max"]) >= val).ToList()
                .ForEach(x =>
@@ -163,7 +191,7 @@ namespace SanPlast.Model
                    {
                        Indeks = y.ToString(),
                        Ilosc = GetFromString(r["Ilosc"]),
-                       Dlugosc = GetFromString(r["L"]) != GetFromString(x["Dl"]) ? GetFromString(r["L"]) : 0,
+                       Dlugosc = val != GetFromString(x["Dl"]) ? val : 0,
                        Typ = "Docinany"
                    }));
                    if (x["Ilosciowe"].ToString().Length > 1) GetList(x["Ilosciowe"]).ForEach(y => LK.Add(new Komponent
@@ -177,7 +205,7 @@ namespace SanPlast.Model
                    {
                        Indeks = y.ToString(),
                        Ilosc = GetFromString(r["Ilosc"]),
-                       Dlugosc = GetFromString(new object[] { r["L"], 100 }, '+'),
+                       Dlugosc = val + 100,
                        Typ = "m"
                    }));
                });
@@ -188,12 +216,19 @@ namespace SanPlast.Model
                 int i = Convert.ToInt32(r["NN"]);
                 LS[i].Wys = GetFromString(r["L"]);
                 LS[i].Sz = GetFromString(r["W"]);
-                LS[i].Sz = GetFromString(r["W"]);
                 LS[i].Strona = (Strona ? r["Uwaga"].ToString()[0] : r["Uwaga"].ToString()[1]).ToString();
                 int[] p = Array.ConvertAll(r["Reg"].ToString().Split(';'), s => int.Parse(s));
                 LS[i].OdSzNom = new int[] { p[0], -p[1], p[0] - p[1] };
-                LS[i].Adres = @"F:\SanPlast\Szyby\" + r["Element"].ToString() + LS[i].Strona + ".SLDDRW";
+                string folder = "";
                 LS[i].Nazwa = r["Element"].ToString();
+                if (LS[i].Nazwa.Contains("Ścianka"))
+                {
+                    if (Cutout) folder += "Cut";
+                    if (Slant) folder += "Slant";
+                    if (folder.Length > 0) folder += "\\";
+                }
+                LS[i].Adres = @"F:\SanPlast\Szyby\" + folder + LS[i].Nazwa + LS[i].Strona + ".SLDDRW";
+
                 LS[i].GetOdchylka();
                 Drukuj(LS[i]);
             }
@@ -225,6 +260,28 @@ namespace SanPlast.Model
                     dim.SystemValue = Szyba.Sz * .001;
                     dim = (Dimension)model.Parameter("D3@PK");
                     dim.SystemValue = Szyba.SzG * .001;
+
+                    //Slant
+                    try
+                    {
+                        dim = (Dimension)model.Parameter("K@PK");
+                        dim.SystemValue = SlantDim[1] * Math.PI / 180;
+                        dim = (Dimension)model.Parameter("S2@PK");
+                        dim.SystemValue = 12 * .001;
+                        dim = (Dimension)model.Parameter("S1@PK");
+                        dim.SystemValue = SlantDim[0] * .001;
+                    }
+                    catch { }
+                    //Cutout
+                    try
+                    {
+                        dim = (Dimension)model.Parameter("C1@PK");
+                        dim.SystemValue = CutoutDim[0] * .001;
+                        dim = (Dimension)model.Parameter("C2@PK");
+                        dim.SystemValue = (CutoutDim[2] - 12) * .001;
+                    }
+                    catch { }
+
 
                     Note myNote = drawing.InsertNote("$PRPSHEET:\"Kolor\"");
                     Annotation swAnn;
@@ -387,6 +444,7 @@ namespace SanPlast.Model
         public int Sz { get; set; }
         public int SzG { get; set; }
         public int OdSz { get; set; }
+        public int[] OdPr { get; set; }
 
         public int[] SlantDim { get; set; }
         public int[] CutDim { get; set; }
@@ -397,18 +455,25 @@ namespace SanPlast.Model
         public string Nazwa { get; set; }
         public void GetOdchylka()
         {
+            //OdPr = new int[] { OdSzNom[2], OdSzNom[2] };
             if (OdSz >= OdSzNom[2] && OdSz <= OdSzNom[1])
             { SzG = Sz; }
             else
             {
                 if (OdSzB)
-                { SzG = Sz + OdSz; }
+                {
+
+                    SzG = Sz + OdSz;
+                }
                 else
                 {
-                    Sz -= (OdSz < OdSzNom[1]) ? OdSzNom[2] : (OdSz > OdSzNom[2]) ? OdSzNom[1] : 0;
-                    SzG = Sz + ((Math.Abs(OdSz) > OdSzNom[0]) ? OdSz : 0);
+                    int g = (OdSz < OdSzNom[1]) ? OdSzNom[2] : (OdSz > OdSzNom[2]) ? OdSzNom[1] : 0;
+                    int d = (Math.Abs(OdSz) > OdSzNom[0]) ? OdSz : 0;
+                    Sz -= g;
+                    SzG = Sz + d;
                 }
             }
+
         }
     }
 }
